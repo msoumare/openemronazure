@@ -1,0 +1,43 @@
+name: Build and Deploy OpenEMR
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  AZURE_RESOURCE_GROUP: openemr-rg
+  AZURE_LOCATION: westeurope
+  ACR_NAME: openemracr
+  STORAGE_ACCOUNT: openemrstorage
+  MYSQL_ADMIN: openemradmin
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Log in to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Generate MySQL Admin Password
+        id: pwgen
+        run: |
+          # Generate a strong 32-char random password
+          MYSQL_PASSWORD=$(openssl rand -base64 32 | tr -d '=+/')
+          echo "mysql_password=$MYSQL_PASSWORD" >> $GITHUB_OUTPUT
+
+      - name: Deploy Bicep Infrastructure
+        run: |
+          az deployment sub create \
+            --location $AZURE_LOCATION \
+            --template-file infra/main.bicep \
+            --parameters resourceGroupName=$AZURE_RESOURCE_GROUP \
+                         location=$AZURE_LOCATION \
+                         acrName=$ACR_NAME \
+                         storageAccountName=$STORAGE_ACCOUNT \
+                         mysqlAdminUser=$MYSQL_ADMIN \
+                         mysqlAdminPassword=${{ steps.pwgen.outputs.mysql_password }}

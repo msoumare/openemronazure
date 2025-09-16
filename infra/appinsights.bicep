@@ -10,3 +10,5 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
     WorkspaceResourceId: workspaceId
   }
 }
+
+output instrumentationKey string = appInsights.properties.InstrumentationKey
