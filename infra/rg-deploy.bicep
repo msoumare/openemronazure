@@ -57,24 +57,39 @@ module uami './uami.bicep' = {
 // --------------------
 // RBAC: grant UAMI access to Key Vault
 // --------------------
-module rbac './rbac.bicep' = {
-  name: 'rbac-deploy'
+module rbac './rbac-keyvault.bicep' = {
+  name: 'rbac-keyvault-deploy'
   params: {
     principalId: uami.outputs.uamiPrincipalId
     keyVaultName: kv.name
+    roleDefinitionId: subscriptionResourceId(
+      'Microsoft.Authorization/roleDefinitions',
+      '4633458b-17de-408a-b874-0445c86b69e6' // Key Vault Secrets User
+    )    
   }
 }
 
-module rbacStorage './rbac-storage' = {
-  name: 'rbac-storage'
+module rbacStorage './rbac-storage.bicep' = {
+  name: 'rbac-storage-deploy'
   params: {
     principalId: uami.outputs.uamiPrincipalId
-    resourceId: storage.outputs.storageAccountId
-    resourceType: 'Microsoft.Storage/storageAccounts'
+    storageAccountName: storageAccountName
     roleDefinitionId: subscriptionResourceId(
       'Microsoft.Authorization/roleDefinitions',
       'a7264617-510b-4343-a828-9731dc254ea7' // Storage File Data SMB Share Contributor
-    )
+    )    
+  }
+}
+
+module rbacAcr './rbac-acr.bicep' = {
+  name: 'rbac-acr-deploy'
+  params: {
+    principalId: uami.outputs.uamiPrincipalId
+    acrName: acrName
+    roleDefinitionId: subscriptionResourceId(
+      'Microsoft.Authorization/roleDefinitions',
+      '7f951dda-4ed3-4680-a7ca-43fe172d538d' // Built-in role definition ID for AcrPull
+    )    
   }
 }
 
