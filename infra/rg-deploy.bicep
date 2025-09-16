@@ -1,10 +1,12 @@
+targetScope = 'resourceGroup'
 
+param location string
 param acrName string
 param mysqlAdminUser string
+@secure()
 param mysqlAdminPassword string
 param storageAccountName string
 
-// Deploy ACR
 module acr './acr.bicep' = {
   name: 'acr-deploy'
   params: {
@@ -13,7 +15,6 @@ module acr './acr.bicep' = {
   }
 }
 
-// Deploy MySQL
 module mysql './mysql.bicep' = {
   name: 'mysql-deploy'
   params: {
@@ -23,7 +24,6 @@ module mysql './mysql.bicep' = {
   }
 }
 
-// Deploy Storage Account
 module storage './storage.bicep' = {
   name: 'storage-deploy'
   params: {
@@ -32,7 +32,6 @@ module storage './storage.bicep' = {
   }
 }
 
-// Deploy Key Vault with secrets
 module keyvault './keyvault.bicep' = {
   name: 'kv-deploy'
   params: {
@@ -42,7 +41,6 @@ module keyvault './keyvault.bicep' = {
   }
 }
 
-// Deploy Log Analytics
 module logs './loganalytics.bicep' = {
   name: 'logs-deploy'
   params: {
@@ -50,7 +48,6 @@ module logs './loganalytics.bicep' = {
   }
 }
 
-// Deploy Application Insights
 module appInsights './appinsights.bicep' = {
   name: 'ai-deploy'
   params: {
@@ -59,7 +56,6 @@ module appInsights './appinsights.bicep' = {
   }
 }
 
-// Deploy Container App (OpenEMR)
 module aca './aca.bicep' = {
   name: 'aca-deploy'
   params: {
