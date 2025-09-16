@@ -37,6 +37,12 @@ Deploy a production-ready OpenEMR stack on Microsoft Azure using containerizatio
     git clone https://github.com/dkirby-ms/
     ```
 
+- Make a copy of the .env.example file. Make changes to the default values if desired by opening the new file and editing it.
+
+    ```sh
+    cp ./infra/.env.example ./infra/.env
+    ```
+
 - Navigate to the [./infra](infra) folder and run docker compose up.
 
     ```sh
