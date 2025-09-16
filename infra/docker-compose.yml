@@ -1,0 +1,94 @@
+# Simple production-style deployment of OpenEMR + MySQL
+# NOTE: For production harden credentials, add real TLS certs, and secure backups.
+# Default admin login (change in production): OE_USER=admin / OE_PASS=pass
+#
+# Credential simplification:
+#   Define DB_USER / DB_PASSWORD once (in a .env file or your shell) and both containers
+#   will consume them. MySQL image still requires MYSQL_USER / MYSQL_PASSWORD internally
+#   and OpenEMR image requires MYSQL_USER / MYSQL_PASS, so we map them to the shared pair.
+#   Example .env entries (do NOT commit real secrets):
+#     DB_USER=openemr
+#     DB_PASSWORD=openemr
+#     MYSQL_ROOT_PASSWORD=root
+#     MYSQL_DATABASE=openemr
+#     OE_USER=admin
+#     OE_PASS=pass
+
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    command: ["mysqld","--character-set-server=utf8mb4","--collation-server=utf8mb4_unicode_ci"]
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      # Application database + user
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-openemr}
+      # Use unified DB_USER / DB_PASSWORD so both services stay in sync
+      MYSQL_USER: ${DB_USER:-openemr}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-openemr}
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      start_period: 60s
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - db_data:/var/lib/mysql
+    # Expose MySQL port to host for local client access (remove or firewall in production)
+    ports:
+      - "3306:3306"
+    # You can set TZ if desired
+    # environment:
+    #   TZ: UTC
+
+  openemr:
+    # Pin to a known stable OpenEMR release instead of floating :latest to avoid
+    # unexpected breaking changes. Update intentionally after reviewing release notes.
+    # To change versions: replace the tag below and run: docker compose pull openemr && docker compose up -d openemr
+    image: openemr/openemr:7.0.2
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+    # Map to non-privileged host ports; adjust as needed
+    ports:
+      - "8080:80"   # HTTP
+      - "8443:443"  # HTTPS
+    environment:
+      # Required by OpenEMR container to find DB
+      MYSQL_HOST: mysql
+      MYSQL_ROOT_PASS: ${MYSQL_ROOT_PASSWORD:-root}
+      # Keep in sync with MySQL service: map to unified DB_USER / DB_PASSWORD
+      MYSQL_USER: ${DB_USER:-openemr}
+      MYSQL_PASS: ${DB_PASSWORD:-openemr}
+      OE_USER: ${OE_USER:-admin}
+      OE_PASS: ${OE_PASS:-pass}
+      # Optional: set a timezone (PHP + OS). Example: America/New_York
+      TZ: ${TZ:-UTC}
+    volumes:
+      - openemr_sites:/var/www/localhost/htdocs/openemr/sites
+      - openemr_logs:/var/log
+      # If you plan to provide your own SSL certs, uncomment and place files:
+      # - ./certs/fullchain.pem:/etc/ssl/certs/openemr.crt:ro
+      # - ./certs/privkey.pem:/etc/ssl/private/openemr.key:ro
+    healthcheck:
+      test: ["CMD-SHELL", "curl -kfsS https://localhost/ || exit 1"]
+      start_period: 180s
+      interval: 60s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db_data: {}
+  openemr_sites: {}
+  openemr_logs: {}
+
+# Usage:
+# 1. (Optional) Create a .env file in this directory to override defaults, e.g.:
+#    MYSQL_ROOT_PASSWORD=ChangeMeRoot!
+#    MYSQL_PASSWORD=ChangeMeUser!
+#    OE_PASS=StrongerAdminPass!
+# 2. docker compose up -d
+# 3. Browse to https://localhost:8443 (self-signed cert) or http://localhost:8080
+# 4. Login with OE_USER / OE_PASS (defaults admin / pass) and immediately change the password.
+# 5. Back up volumes regularly (db_data + openemr_sites).

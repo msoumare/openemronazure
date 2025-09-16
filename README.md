@@ -21,8 +21,42 @@ Deploy a production-ready OpenEMR stack on Microsoft Azure using containerizatio
 - Horizontal scale of web tier
 - Least-privilege secrets flow
 
-## Prerequisites
+## Dev Setup
+
+### Prerequisites
 - Azure subscription + Owner or sufficient RBAC
-- az CLI (latest)
+- Azure CLI
 - Docker + Compose (local dev)
-- Bicep
+- Git CLI
+
+### Local dev with Docker
+
+- Clone the project repo.
+
+    ```sh
+    git clone https://github.com/dkirby-ms/
+    ```
+
+- Navigate to the [./infra](infra) folder and run docker compose up.
+
+    ```sh
+    cd ./infra
+    docker compose up -d
+    ```
+- Confirm the OpenEMR container is up and running by checking the logs.
+
+    ```sh
+    docker logs infra-openemr-1
+    ```
+
+    ![alt text](./docs/img/image.png)
+
+- Open a browser and navigate to [http://localhost:8080](http://localhost:8080)
+
+    ![alt text](./docs/img/image-1.png)
+
+- Use docker compose down to tear down (with -v to remove volumes).
+
+    ```sh
+    docker compose down -v
+    ```
