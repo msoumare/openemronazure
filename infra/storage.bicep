@@ -18,6 +18,5 @@ resource share 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01
   }
 }
 
-output storageKey string = listKeys(sa.id, '2023-01-01').keys[0].value
-output storageAccountName string = storageAccountName
+output storageAccountId string = sa.id
 output fileShareName string = share.name

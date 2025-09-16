@@ -1,18 +1,30 @@
 param location string
 param acrServer string
-param mysqlConnectionSecretUri string
+param mysqlUserSecretUri string
+param mysqlPasswordSecretUri string
+param storageAccountId string
 param storageShareName string
-param storageAccountName string
 param appInsightsKey string
+@description('Resource ID of the User Assigned Managed Identity to attach to ACA')
+param userAssignedIdentityId string
 
+// ACA Environment
 resource acaEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
   name: 'openemr-env'
   location: location
+  properties: {}
 }
 
+// Container App
 resource aca 'Microsoft.App/containerApps@2023-05-01' = {
   name: 'openemr-app'
   location: location
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${userAssignedIdentityId}': {}
+    }
+  }
   properties: {
     managedEnvironmentId: acaEnv.id
     configuration: {
@@ -23,8 +35,14 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
       ]
       secrets: [
         {
-          name: 'mysql-conn'
-          value: mysqlConnectionSecretUri
+          name: 'mysql-admin-user'
+          keyVaultUrl: mysqlUserSecretUri
+          identity: userAssignedIdentityId
+        }
+        {
+          name: 'mysql-admin-password'
+          keyVaultUrl: mysqlPasswordSecretUri
+          identity: userAssignedIdentityId
         }
       ]
       activeRevisionsMode: 'Single'
@@ -36,8 +54,12 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
           image: '${acrServer}/openemr:latest'
           env: [
             {
-              name: 'MYSQL_CONN'
-              secretRef: 'mysql-conn'
+              name: 'MYSQL_ADMIN_USER'
+              secretRef: 'mysql-admin-user'
+            }
+            {
+              name: 'MYSQL_ADMIN_PASSWORD'
+              secretRef: 'mysql-admin-password'
             }
             {
               name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
@@ -52,13 +74,18 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
           ]
         }
       ]
-      volumes: [
-        {
-          name: 'sites-volume'
-          storageType: 'AzureFile'
-          storageName: storageShareName
-        }
-      ]
+      volumes: any([
+          {
+            name: 'sites-volume'
+            storageType: 'AzureFile'
+            storageName: storageShareName
+            storageAccountId: storageAccountId
+            identity: userAssignedIdentityId
+          }
+        ])
     }
   }
 }
+
+// Outputs
+output containerAppName string = aca.name
