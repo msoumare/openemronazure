@@ -1,75 +1,27 @@
-targetScope = 'resourceGroup'
+targetScope = 'subscription'
 
-param location string = resourceGroup().location
-param acrName string
-param mysqlAdminUser string
-param mysqlAdminPassword string
-param storageAccountName string
+@description('Name of the Resource Group to create')
+param resourceGroupName string = 'openemr-rg'
 
-// Deploy ACR
-module acr './acr.bicep' = {
-  name: 'acr-deploy'
+@description('Azure region for all resources')
+param location string = 'westeurope'
+
+// Create Resource Group
+resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+  name: resourceGroupName
+  location: location
+}
+
+// Deploy everything inside RG
+module rgDeploy './rg-deploy.bicep' = {
+  name: 'rg-deployment'
+  scope: rg
   params: {
     location: location
-    acrName: acrName
+    acrName: 'openemracr'
+    mysqlAdminUser: 'openemradmin'
+    mysqlAdminPassword: 'ChangeMe123!'
+    storageAccountName: 'openemrstorage'
   }
 }
 
-// Deploy MySQL
-module mysql './mysql.bicep' = {
-  name: 'mysql-deploy'
-  params: {
-    location: location
-    adminUser: mysqlAdminUser
-    adminPassword: mysqlAdminPassword
-  }
-}
-
-// Deploy Storage Account
-module storage './storage.bicep' = {
-  name: 'storage-deploy'
-  params: {
-    location: location
-    storageAccountName: storageAccountName
-  }
-}
-
-// Deploy Key Vault with secrets
-module keyvault './keyvault.bicep' = {
-  name: 'kv-deploy'
-  params: {
-    location: location
-    mysqlConnection: mysql.outputs.connectionString
-    storageKey: storage.outputs.storageKey
-  }
-}
-
-// Deploy Log Analytics
-module logs './loganalytics.bicep' = {
-  name: 'logs-deploy'
-  params: {
-    location: location
-  }
-}
-
-// Deploy Application Insights
-module appInsights './appinsights.bicep' = {
-  name: 'ai-deploy'
-  params: {
-    location: location
-    workspaceId: logs.outputs.workspaceId
-  }
-}
-
-// Deploy Container App (OpenEMR)
-module aca './aca.bicep' = {
-  name: 'aca-deploy'
-  params: {
-    location: location
-    acrServer: acr.outputs.acrServer
-    mysqlConnectionSecretUri: keyvault.outputs.mysqlConnectionSecretUri
-    storageShareName: storage.outputs.fileShareName
-    storageAccountName: storage.outputs.storageAccountName
-    appInsightsKey: appInsights.outputs.instrumentationKey
-  }
-}
