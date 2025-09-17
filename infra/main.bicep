@@ -104,7 +104,7 @@ module rbac './rbac-keyvault.bicep' = {
   scope: rg
   params: {
     principalId: uami.outputs.uamiPrincipalId
-    keyVaultName: keyvault.name
+    keyVaultName: keyvault.outputs.keyVaultName
     roleDefinitionId: subscriptionResourceId(
       'Microsoft.Authorization/roleDefinitions',
       '4633458b-17de-408a-b874-0445c86b69e6' // Key Vault Secrets User
@@ -117,7 +117,7 @@ module rbacStorage './rbac-storage.bicep' = {
   scope: rg
   params: {
     principalId: uami.outputs.uamiPrincipalId
-    storageAccountName: storageAccountName
+    storageAccountName: storage.outputs.storageAccountName
     roleDefinitionId: subscriptionResourceId(
       'Microsoft.Authorization/roleDefinitions',
       'a7264617-510b-4343-a828-9731dc254ea7' // Storage File Data SMB Share Contributor
@@ -130,7 +130,7 @@ module rbacAcr './rbac-acr.bicep' = {
   scope: rg
   params: {
     principalId: uami.outputs.uamiPrincipalId
-    acrName: acrName
+    acrName: acr.outputs.acrName
     roleDefinitionId: subscriptionResourceId(
       'Microsoft.Authorization/roleDefinitions',
       '7f951dda-4ed3-4680-a7ca-43fe172d538d' // Built-in role definition ID for AcrPull
