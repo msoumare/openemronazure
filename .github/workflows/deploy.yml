@@ -21,7 +21,7 @@ on:
 env:
   AZURE_LOCATION: eastus
   AZURE_RESOURCE_GROUP: 'rg-openemr-dev-eastus'   # ✅ define RG name here (match your bicep param default or override)
-  MYSQL_ADMIN: openemradmin
+  MYSQL_ADMIN: mysql-openemr
 
 jobs:
   deploy:
