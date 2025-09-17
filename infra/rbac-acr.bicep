@@ -2,12 +2,6 @@ param principalId string
 param acrName string
 param roleDefinitionId string
 
-@description('Built-in role definition ID for AcrPull')
-var acrPullRoleId = subscriptionResourceId(
-  'Microsoft.Authorization/roleDefinitions',
-  '7f951dda-4ed3-4680-a7ca-43fe172d538d'
-)
-
 resource acr 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' existing = {
   name: acrName
 }

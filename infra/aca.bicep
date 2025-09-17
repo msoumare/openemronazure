@@ -5,19 +5,21 @@ param mysqlPasswordSecretUri string
 param storageAccountId string
 param storageShareName string
 param appInsightsKey string
+param acaEnvironmentName string
+param containerAppName string
 @description('Resource ID of the User Assigned Managed Identity to attach to ACA')
 param userAssignedIdentityId string
 
 // ACA Environment
 resource acaEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
-  name: 'openemr-env'
+  name: acaEnvironmentName
   location: location
   properties: {}
 }
 
 // Container App
 resource aca 'Microsoft.App/containerApps@2023-05-01' = {
-  name: 'openemr-app'
+  name: containerAppName
   location: location
   identity: {
     type: 'UserAssigned'
