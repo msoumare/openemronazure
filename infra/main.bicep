@@ -43,15 +43,15 @@ module acr './acr.bicep' = {
   }
 }
 
-// Deploy MySQL (reads secrets from KV)
+// Deploy MySQL 
 module mysql './mysql.bicep' = {
   name: 'mysql-deploy'
   scope: rg
   params: {
     location: location
     mySqlName: mySqlName
-    mysqlUser: keyvault.outputs.mysqlUserSecretUri        // ✅ use secret reference
-    mysqlPassword: keyvault.outputs.mysqlPasswordSecretUri
+    mysqlUser: mysqlAdminUser      
+    mysqlPassword: mysqlAdminPassword
   }
 }
 
