@@ -4,17 +4,17 @@ targetScope = 'subscription'
 param mysqlAdminUser string 
 @secure()
 param mysqlAdminPassword string
-param location string = 'eastus'
+param location string = 'westus2'
 param resourceGroupName string
-param acaEnvironmentName string = 'cae-openemr-dev-eastus' 
-param containerAppName string = 'ca-openemr-dev-eastus'
-param acrName string = 'acropenemrdeveastus'
-param appInsightsName string = 'appi-openemr-dev-eastus'
-param keyVaultName string = 'kv-openemr-dev-eastus'
-param logAnalyticsName string = 'log-openemr-dev-eastus'
-param mySqlName string = 'mysql-openemr-dev-eastus'
-param storageAccountName string = 'saopenemrdeveastus'
-param userAssignedIdentityName string = 'uai-openemr-dev-eastus'
+param acaEnvironmentName string = 'cae-openemr-dev-westus2' 
+param containerAppName string = 'ca-openemr-dev-westus2'
+param acrName string = 'acropenemrdevwestus2'
+param appInsightsName string = 'appi-openemr-dev-westus2'
+param keyVaultName string = 'kv-openemr-dev-westus2'
+param logAnalyticsName string = 'log-openemr-dev-westus2'
+param mySqlName string = 'mysql-openemr-dev-westus2'
+param storageAccountName string = 'saopenemrdevwestus2'
+param userAssignedIdentityName string = 'uai-openemr-dev-westus2'
 
 resource rg 'Microsoft.Resources/resourceGroups@2022-09-01' = {
   name: resourceGroupName
@@ -44,16 +44,16 @@ module acr './acr.bicep' = {
 }
 
 // Deploy MySQL (reads secrets from KV)
-// module mysql './mysql.bicep' = {
-//   name: 'mysql-deploy'
-//   scope: rg
-//   params: {
-//     location: location
-//     mySqlName: mySqlName
-//     mysqlUser: mysqlAdminUser
-//     mysqlPassword: mysqlAdminPassword
-//   }
-// }
+module mysql './mysql.bicep' = {
+  name: 'mysql-deploy'
+  scope: rg
+  params: {
+    location: 'location'
+    mySqlName: mySqlName
+    mysqlUser: keyvault.outputs.mysqlUserSecretUri        // ✅ use secret reference
+    mysqlPassword: keyvault.outputs.mysqlPasswordSecretUri
+  }
+}
 
 // Deploy Storage
 module storage './storage.bicep' = {

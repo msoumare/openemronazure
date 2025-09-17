@@ -19,8 +19,8 @@ on:
         default: "dev"
 
 env:
-  AZURE_LOCATION: eastus
-  AZURE_RESOURCE_GROUP: 'rg-openemr-dev-eastus'   # ✅ define RG name here (match your bicep param default or override)
+  AZURE_LOCATION: westus2
+  AZURE_RESOURCE_GROUP: 'rg-openemr-dev-westus2'  
   MYSQL_ADMIN: openemrlogin
 
 jobs:
