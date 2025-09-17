@@ -47,6 +47,7 @@ jobs:
       - name: Deploy Bicep Infrastructure
         run: |
           az deployment sub create \
+            --name main-westus2 \
             --location $AZURE_LOCATION \
             --template-file infra/main.bicep \
             --parameters resourceGroupName=${{ env.AZURE_RESOURCE_GROUP }} \
