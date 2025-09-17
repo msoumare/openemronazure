@@ -33,6 +33,7 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
       registries: [
         {
           server: acrServer
+          identity: userAssignedIdentityId   // ✅ specify the UAMI for ACR pulls
         }
       ]
       secrets: [
@@ -48,6 +49,10 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
         }
       ]
       activeRevisionsMode: 'Single'
+      ingress: {                            // ✅ add ingress so app is reachable
+        external: true
+        targetPort: 80
+      }
     }
     template: {
       containers: [
@@ -68,6 +73,10 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
               value: appInsightsKey
             }
           ]
+          resources: {
+            cpu: '0.5'
+            memory: '1Gi'
+          }
           volumeMounts: [
             {
               volumeName: 'sites-volume'
@@ -76,15 +85,19 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
           ]
         }
       ]
-      volumes: any([
-          {
-            name: 'sites-volume'
-            storageType: 'AzureFile'
-            storageName: storageShareName
-            storageAccountId: storageAccountId
-            identity: userAssignedIdentityId
-          }
-        ])
+      volumes: [                            // ✅ must be an array, not `any([...])`
+        {
+          name: 'sites-volume'
+          storageType: 'AzureFile'
+          storageName: storageShareName
+          storageAccountId: storageAccountId
+          identity: userAssignedIdentityId
+        }
+      ]
+      scale: {                              // ✅ optional but recommended
+        minReplicas: 1
+        maxReplicas: 3
+      }
     }
   }
 }
