@@ -35,7 +35,7 @@ module keyvault './keyvault.bicep' = {
 
 // Deploy ACR
 module acr './acr.bicep' = {
-  // name: 'acr-deploy'
+  name: 'acr-deploy'
   scope: rg
   params: {
     location: location
