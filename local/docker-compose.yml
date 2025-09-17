@@ -78,10 +78,41 @@ services:
       timeout: 5s
       retries: 5
 
+  synthea:
+    # Synthetic patient data generator + ETL loader for OpenEMR
+    # Builds local image from ../synthetic-data/container
+    build:
+      context: ../synthetic-data/container
+      dockerfile: Dockerfile
+    image: openemr-synthea:local
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: "no"  # Run once; exit after inserting data
+    environment:
+      # DB connection (reuse unified credentials)
+      MYSQL_HOST: mysql
+      MYSQL_DB: ${MYSQL_DATABASE:-openemr}
+      MYSQL_USER: ${DB_USER:-openemr}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-openemr}
+      # Number of synthetic patients to generate (override via PATIENT_COUNT=500, etc.)
+      PATIENT_COUNT: ${PATIENT_COUNT:-100}
+      # Optional Azure Blob archival (safe to leave blank)
+      STORAGE_ACCOUNT: ${STORAGE_ACCOUNT:-}
+      BLOB_CONTAINER: ${BLOB_CONTAINER:-}
+      AZURE_STORAGE_CONNECTION_STRING: ${AZURE_STORAGE_CONNECTION_STRING:-}
+    volumes:
+      - synthea_output:/data/output
+    profiles:
+      - data-gen
+    labels:
+      org.openemr.role: synthetic-data-job
+
 volumes:
   db_data: {}
   openemr_sites: {}
   openemr_logs: {}
+  synthea_output: {}
 
 # Usage:
 # 1. (Optional) Create a .env file in this directory to override defaults, e.g.:
@@ -92,3 +123,9 @@ volumes:
 # 3. Browse to https://localhost:8443 (self-signed cert) or http://localhost:8080
 # 4. Login with OE_USER / OE_PASS (defaults admin / pass) and immediately change the password.
 # 5. Back up volumes regularly (db_data + openemr_sites).
+#
+# Synthetic data generation (on-demand job):
+#   docker compose --profile data-gen build synthea
+#   docker compose --profile data-gen run --rm synthea
+# Adjust PATIENT_COUNT in environment or .env to control volume.
+# Result: Inserts rows into patient_data table (created if missing). Duplicate pubpid values will be skipped.
