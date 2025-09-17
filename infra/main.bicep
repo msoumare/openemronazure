@@ -44,16 +44,16 @@ module acr './acr.bicep' = {
 }
 
 // Deploy MySQL (reads secrets from KV)
-module mysql './mysql.bicep' = {
-  name: 'mysql-deploy'
-  scope: rg
-  params: {
-    location: location
-    mySqlName: mySqlName
-    mysqlUser: mysqlAdminUser
-    mysqlPassword: mysqlAdminPassword
-  }
-}
+// module mysql './mysql.bicep' = {
+//   name: 'mysql-deploy'
+//   scope: rg
+//   params: {
+//     location: location
+//     mySqlName: mySqlName
+//     mysqlUser: mysqlAdminUser
+//     mysqlPassword: mysqlAdminPassword
+//   }
+// }
 
 // Deploy Storage
 module storage './storage.bicep' = {
