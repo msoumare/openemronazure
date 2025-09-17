@@ -20,6 +20,7 @@ on:
 
 env:
   AZURE_LOCATION: eastus
+  AZURE_RESOURCE_GROUP: 'rg-openemr-dev-eastus'   # ✅ define RG name here (match your bicep param default or override)
   MYSQL_ADMIN: mysql-openemr-admin-user
 
 jobs:
@@ -48,5 +49,6 @@ jobs:
           az deployment sub create \
             --location $AZURE_LOCATION \
             --template-file infra/main.bicep \
-            --parameters mysqlAdminUser=${{ env.MYSQL_ADMIN }} \
+            --parameters resourceGroupName=${{ env.AZURE_RESOURCE_GROUP }} \
+                         mysqlAdminUser=${{ env.MYSQL_ADMIN }} \
                          mysqlAdminPassword=${{ steps.pwgen.outputs.mysql_password }}
