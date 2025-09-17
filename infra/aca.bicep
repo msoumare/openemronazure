@@ -15,16 +15,21 @@ param userAssignedIdentityId string
 resource acaEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
   name: acaEnvironmentName
   location: location
-  properties: {}
+  properties: {
+    appLogsConfiguration: {
+      destination: 'log-analytics'
+    }
+  }
 }
 
-resource storage 'Microsoft.App/managedEnvironments/storages@2023-05-01' = {
-  name: 'mystorage'
+// ACA Environment Storage (Azure File share)
+resource acaStorage 'Microsoft.App/managedEnvironments/storages@2023-05-01' = {
+  name: 'mystorage' // name used in volumes below
   parent: acaEnv
   properties: {
     azureFile: {
       accountName: storageAccountName
-      shareName: 'sites'
+      shareName: storageShareName
       accessMode: 'ReadWrite'
       accountKey: listKeys(storageAccountId, '2022-09-01').keys[0].value
     }
@@ -102,7 +107,7 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
         {
           name: 'sites-volume'
           storageType: 'AzureFile'
-          storageName: storageShareName
+          storageName: 'mystorage' // must match acaStorage resource
         }
       ]
       scale: {
@@ -113,5 +118,4 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
   }
 }
 
-// Outputs
 output containerAppName string = aca.name
