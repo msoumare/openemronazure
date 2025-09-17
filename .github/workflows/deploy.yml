@@ -18,6 +18,9 @@ on:
         - prd
         default: "dev"  
 
+env:
+  AZURE_LOCATION: eastus  
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -36,5 +39,6 @@ jobs:
     - name: Deploy Bicep Infrastructure
       run: |
         az deployment sub create \
-        --template-file infra/main.bicep
+        --location $AZURE_LOCATION \
+        --template-file infra/main.bicep 
 
