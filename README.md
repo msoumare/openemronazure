@@ -40,19 +40,19 @@ Deploy a production-ready OpenEMR stack on Microsoft Azure using containerizatio
 - Make a copy of the .env.example file. Make changes to the default values if desired by opening the new file and editing it.
 
     ```sh
-    cp ./infra/.env.example ./infra/.env
+    cp ./local/.env.example ./local/.env
     ```
 
-- Navigate to the [./infra](infra) folder and run docker compose up.
+- Navigate to the [./local](infra) folder and run docker compose up.
 
     ```sh
-    cd ./infra
+    cd ./local
     docker compose up -d
     ```
 - Confirm the OpenEMR container is up and running by checking the logs.
 
     ```sh
-    docker logs infra-openemr-1
+    docker logs local-openemr-1
     ```
 
     ![alt text](./docs/img/image.png)
