@@ -1,11 +1,11 @@
 param location string
 param mySqlName string
-param mysqlUserSecretUri string
-param mysqlPasswordSecretUri string
+@secure()
+param mysqlUser string
 
-// Resolve values from Key Vault
-var mysqlUser = reference(mysqlUserSecretUri, '2023-07-01', 'Full').value
-var mysqlPassword = reference(mysqlPasswordSecretUri, '2023-07-01', 'Full').value
+@secure()
+param mysqlPassword string
+
 
 resource mysql 'Microsoft.DBforMySQL/flexibleServers@2023-06-01-preview' = {
   name: mySqlName
@@ -23,5 +23,3 @@ resource mysql 'Microsoft.DBforMySQL/flexibleServers@2023-06-01-preview' = {
     }
   }
 }
-
-output connectionString string = 'Server=${mysql.properties.fullyQualifiedDomainName};Database=openemr;Uid=${mysqlUser};Pwd=${mysqlPassword};SslMode=Required;'

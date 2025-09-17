@@ -1,13 +1,14 @@
 targetScope = 'subscription'
 
 @secure()
-param mysqlAdminPassword string
 param mysqlAdminUser string 
+@secure()
+param mysqlAdminPassword string
 param location string = 'eastus'
 param resourceGroupName string
 param acaEnvironmentName string = 'cae-openemr-dev-eastus' 
 param containerAppName string = 'ca-openemr-dev-eastus'
-param acrName string = 'acr-openemr-dev-eastus'
+param acrName string = 'acropenemrdeveastus'
 param appInsightsName string = 'appi-openemr-dev-eastus'
 param keyVaultName string = 'kv-openemr-dev-eastus'
 param logAnalyticsName string = 'log-openemr-dev-eastus'
@@ -49,8 +50,8 @@ module mysql './mysql.bicep' = {
   params: {
     location: location
     mySqlName: mySqlName
-    mysqlUserSecretUri: keyvault.outputs.mysqlUserSecretUri
-    mysqlPasswordSecretUri: keyvault.outputs.mysqlPasswordSecretUri
+    mysqlUser: keyvault.outputs.mysqlUserSecretUri
+    mysqlPassword: keyvault.outputs.mysqlPasswordSecretUri
   }
 }
 
