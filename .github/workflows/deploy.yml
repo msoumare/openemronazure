@@ -49,7 +49,6 @@ jobs:
         az deployment sub create \
         --location $AZURE_LOCATION \
         --template-file infra/main.bicep \
-        --parameters resourceGroupName=$AZURE_RESOURCE_GROUP \
-            mysqlAdminUser=${{ env.MYSQL_ADMIN }} \
+        --parameters mysqlAdminUser=${{ env.MYSQL_ADMIN }} \
             mysqlAdminPassword=${{ steps.pwgen.outputs.mysql_password }}        
 
