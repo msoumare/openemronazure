@@ -151,9 +151,9 @@ module aca './aca.bicep' = {
     mysqlUserSecretUri: keyvault.outputs.mysqlUserSecretUri
     mysqlPasswordSecretUri: keyvault.outputs.mysqlPasswordSecretUri
     storageShareName: storage.outputs.fileShareName
-    storageAccountId:  resourceId('Microsoft.Storage/storageAccounts', storageAccountName)   
+    storageAccountId: storage.outputs.storageAccountId  
     appInsightsKey: appInsights.outputs.instrumentationKey
-    userAssignedIdentityId: resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', userAssignedIdentityName)  // ✅ full resourceId
+    userAssignedIdentityId: uami.outputs.uamiId
     acaEnvironmentName: acaEnvironmentName
     containerAppName: containerAppName
   }
