@@ -52,4 +52,5 @@ jobs:
             --parameters resourceGroupName=${{ env.AZURE_RESOURCE_GROUP }} \
                          mysqlAdminUser=${{ env.MYSQL_ADMIN }} \
                          mysqlAdminPassword=${{ steps.pwgen.outputs.mysql_password }} \
+            --debug \
             --output json
