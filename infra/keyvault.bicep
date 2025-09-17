@@ -40,5 +40,5 @@ resource mysqlPasswordSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
 
 output keyVaultId string = kv.id
 output keyVaultName string = kv.name
-output mysqlUserSecretUri string = mysqlUserSecret.properties.value
-output mysqlPasswordSecretUri string = mysqlPasswordSecret.properties.value
+output mysqlUserSecretUri string = mysqlUserSecret.properties.secretUriWithVersion
+output mysqlPasswordSecretUri string = mysqlPasswordSecret.properties.secretUriWithVersion
