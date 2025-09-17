@@ -101,6 +101,5 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
   }
 }
 
-
 // Outputs
 output containerAppName string = aca.name
