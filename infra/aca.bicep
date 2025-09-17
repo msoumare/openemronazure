@@ -30,10 +30,14 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
   properties: {
     managedEnvironmentId: acaEnv.id
     configuration: {
+      ingress: {
+        external: true
+        targetPort: 80
+      }
       registries: [
         {
           server: acrServer
-          identity: userAssignedIdentityId   // ✅ specify the UAMI for ACR pulls
+          identity: userAssignedIdentityId
         }
       ]
       secrets: [
@@ -48,17 +52,16 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
           identity: userAssignedIdentityId
         }
       ]
-      activeRevisionsMode: 'Single'
-      ingress: {                            // ✅ add ingress so app is reachable
-        external: true
-        targetPort: 80
-      }
     }
     template: {
       containers: [
         {
           name: 'openemr'
           image: '${acrServer}/openemr:latest'
+          resources: {
+            cpu: '0.5'
+            memory: '1Gi'
+          }
           env: [
             {
               name: 'MYSQL_ADMIN_USER'
@@ -73,10 +76,6 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
               value: appInsightsKey
             }
           ]
-          resources: {
-            cpu: '0.5'
-            memory: '1Gi'
-          }
           volumeMounts: [
             {
               volumeName: 'sites-volume'
@@ -85,22 +84,23 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
           ]
         }
       ]
-      volumes: [                            // ✅ must be an array, not `any([...])`
+      volumes: [
         {
           name: 'sites-volume'
           storageType: 'AzureFile'
           storageName: storageShareName
-          storageAccountId: storageAccountId
-          identity: userAssignedIdentityId
+          storageAccountId: storageAccountId   // ✅ must be a full resourceId()
+          identity: userAssignedIdentityId     // ✅ must be full UAMI resourceId()
         }
       ]
-      scale: {                              // ✅ optional but recommended
+      scale: {
         minReplicas: 1
         maxReplicas: 3
       }
     }
   }
 }
+
 
 // Outputs
 output containerAppName string = aca.name
