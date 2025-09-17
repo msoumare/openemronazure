@@ -142,20 +142,20 @@ module rbacAcr './rbac-acr.bicep' = {
 // --------------------
 // ACA (uses UAMI to fetch secrets from KV)
 // --------------------
-module aca './aca.bicep' = {
-  name: 'aca-deploy'
-  scope: rg
-  params: {
-    location: location
-    acrServer: acr.outputs.acrServer
-    mysqlUserSecretUri: keyvault.outputs.mysqlUserSecretUri
-    mysqlPasswordSecretUri: keyvault.outputs.mysqlPasswordSecretUri
-    storageShareName: storage.outputs.fileShareName
-    storageAccountId: storage.outputs.storageAccountId  
-    appInsightsKey: appInsights.outputs.instrumentationKey
-    userAssignedIdentityId: uami.outputs.uamiId
-    acaEnvironmentName: acaEnvironmentName
-    containerAppName: containerAppName
-  }
-}
+// module aca './aca.bicep' = {
+//   name: 'aca-deploy'
+//   scope: rg
+//   params: {
+//     location: location
+//     acrServer: acr.outputs.acrServer
+//     mysqlUserSecretUri: keyvault.outputs.mysqlUserSecretUri
+//     mysqlPasswordSecretUri: keyvault.outputs.mysqlPasswordSecretUri
+//     storageShareName: storage.outputs.fileShareName
+//     storageAccountId: storage.outputs.storageAccountId  
+//     appInsightsKey: appInsights.outputs.instrumentationKey
+//     userAssignedIdentityId: uami.outputs.uamiId
+//     acaEnvironmentName: acaEnvironmentName
+//     containerAppName: containerAppName
+//   }
+// }
 
