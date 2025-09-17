@@ -50,8 +50,8 @@ module mysql './mysql.bicep' = {
   params: {
     location: location
     mySqlName: mySqlName
-    mysqlUser: keyvault.outputs.mysqlUserSecretUri
-    mysqlPassword: keyvault.outputs.mysqlPasswordSecretUri
+    mysqlUser: mysqlAdminUser
+    mysqlPassword: mysqlAdminPassword
   }
 }
 
