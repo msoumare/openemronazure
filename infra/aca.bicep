@@ -3,6 +3,7 @@ param acrServer string
 param mysqlUserSecretUri string
 param mysqlPasswordSecretUri string
 param storageAccountId string
+param storageAccountName string
 param storageShareName string
 param appInsightsKey string
 param acaEnvironmentName string
@@ -15,6 +16,19 @@ resource acaEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
   name: acaEnvironmentName
   location: location
   properties: {}
+}
+
+resource storage 'Microsoft.App/managedEnvironments/storages@2023-05-01' = {
+  name: 'mystorage'
+  parent: acaEnv
+  properties: {
+    azureFile: {
+      accountName: storageAccountName
+      shareName: 'sites'
+      accessMode: 'ReadWrite'
+      accountKey: listKeys(storageAccountId, '2022-09-01').keys[0].value
+    }
+  }
 }
 
 // Container App
@@ -89,8 +103,6 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
           name: 'sites-volume'
           storageType: 'AzureFile'
           storageName: storageShareName
-          storageAccountId: storageAccountId   // ✅ must be a full resourceId()
-          identity: userAssignedIdentityId     // ✅ must be full UAMI resourceId()
         }
       ]
       scale: {
