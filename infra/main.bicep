@@ -5,15 +5,15 @@ param mysqlAdminPassword string
 param mysqlAdminUser string 
 param location string = 'eastus'
 param resourceGroupName string
-param acaEnvironmentName string = 'cae-openemr-dev-${location}' 
-param containerAppName string = 'ca-openemr-dev-${location}'
-param acrName string = 'acr-openemr-dev-${location}'
-param appInsightsName string = 'appi-openemr-dev-${location}'
-param keyVaultName string = 'kv-openemr-dev-${location}'
-param logAnalyticsName string = 'log-openemr-dev-${location}'
-param mySqlName string = 'mysql-openemr-dev-${location}'
-param storageAccountName string = 'sa-openemr-dev-${location}'
-param userAssignedIdentityName string = 'uai-openemr-dev-${location}'
+param acaEnvironmentName string = 'cae-openemr-dev-eastus' 
+param containerAppName string = 'ca-openemr-dev-eastus'
+param acrName string = 'acr-openemr-dev-eastus'
+param appInsightsName string = 'appi-openemr-dev-eastus'
+param keyVaultName string = 'kv-openemr-dev-eastus'
+param logAnalyticsName string = 'log-openemr-dev-eastus'
+param mySqlName string = 'mysql-openemr-dev-eastus'
+param storageAccountName string = 'saopenemrdeveastus'
+param userAssignedIdentityName string = 'uai-openemr-dev-eastus'
 
 resource rg 'Microsoft.Resources/resourceGroups@2022-09-01' = {
   name: resourceGroupName
