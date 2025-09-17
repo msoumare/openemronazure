@@ -121,7 +121,7 @@ module rbacStorage './rbac-storage.bicep' = {
     storageAccountName: storage.outputs.storageAccountName
     roleDefinitionId: subscriptionResourceId(
       'Microsoft.Authorization/roleDefinitions',
-      'a7264617-510b-4343-a828-9731dc254ea7' // Storage File Data SMB Share Contributor
+      '0c867c2a-1d8c-454a-a3db-ab2ea1bdc8bb' // Storage File Data SMB Share Contributor
     )    
   }
 }
