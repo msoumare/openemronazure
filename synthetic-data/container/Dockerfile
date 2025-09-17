@@ -25,6 +25,7 @@ RUN git clone --depth 1 --branch ${SYNTHEA_VERSION} https://github.com/synthetic
 
 COPY run.sh /app/run.sh
 COPY etl.py /app/etl.py
+COPY synthea.properties /opt/synthea/synthea-local.properties
 RUN chmod +x /app/run.sh
 
 ENV JAVA_OPTS="-Xms512m -Xmx1g"

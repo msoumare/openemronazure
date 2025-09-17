@@ -9,8 +9,8 @@ import pandas as pd
 
 OPENEMR_PATIENT_INSERT = """
 INSERT INTO patient_data (
-  pubpid, fname, lname, DOB, sex, status, created_at, updated_at
-) VALUES (%s,%s,%s,%s,%s,%s,UTC_TIMESTAMP(),UTC_TIMESTAMP())
+    pubpid, pid, fname, lname, DOB, sex, status
+) VALUES (%s,%s,%s,%s,%s,%s,%s)
 """
 
 def get_mysql_connection():
@@ -58,6 +58,11 @@ def load_patients(csv_dir: str, conn):
     df = pd.read_csv(patients_csv)
     inserted = 0
     cursor = conn.cursor()
+    # Determine starting pid (avoid reusing 0 which is default and already unique)
+    cursor.execute("SELECT MAX(pid) FROM patient_data WHERE pid > 0")
+    max_pid_row = cursor.fetchone()
+    max_pid = max_pid_row[0] if max_pid_row and max_pid_row[0] is not None else 0
+    next_pid = max_pid + 1
     for _, row in df.iterrows():
         pubpid = row['Id']
         fname = row.get('FIRST')
@@ -66,7 +71,8 @@ def load_patients(csv_dir: str, conn):
         gender = row.get('GENDER')
         status = 'active'
         try:
-            cursor.execute(OPENEMR_PATIENT_INSERT, [pubpid, fname, lname, dob, gender, status])
+            cursor.execute(OPENEMR_PATIENT_INSERT, [pubpid, next_pid, fname, lname, dob, gender, status])
+            next_pid += 1
             inserted += 1
         except Exception as e:
             print(f'Insert failed for {pubpid}: {e}', file=sys.stderr)

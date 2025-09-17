@@ -61,6 +61,13 @@ Deploy a production-ready OpenEMR stack on Microsoft Azure using containerizatio
 
     ![alt text](./docs/img/image-1.png)
 
+- Generate synthetic data with the Synthea container.
+
+    ```sh
+    docker compose --profile data-gen build synthea
+    docker compose --profile data-gen run --rm synthea
+    ```
+    
 - Use docker compose down to tear down (with -v to remove volumes).
 
     ```sh
@@ -114,12 +121,6 @@ synthetic-data/
 	infra/             Bicep template (data generation subset)
 	container/         Docker context for Synthea + ETL
 	scripts/           Deployment helper scripts
-```
-
-### Local Run (no Azure)
-```bash
-docker build -t synthea-local ./synthetic-data/container
-docker run --rm -e PATIENT_COUNT=25 synthea-local
 ```
 
 ### Future Improvements
