@@ -53,4 +53,4 @@ jobs:
                          mysqlAdminUser=${{ env.MYSQL_ADMIN }} \
                          mysqlAdminPassword=${{ steps.pwgen.outputs.mysql_password }} \
             --debug \
-            --output json
+            --verbose
