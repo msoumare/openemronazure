@@ -19,4 +19,5 @@ resource share 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01
 }
 
 output storageAccountId string = sa.id
+output storageAccountName string = sa.name
 output fileShareName string = share.name
