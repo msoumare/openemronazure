@@ -1,8 +1,9 @@
 param location string
 param keyVaultName string
 @secure()
-param mysqlAdminPassword string
 param mysqlAdminUser string 
+@secure()
+param mysqlAdminPassword string
 
 resource kv 'Microsoft.KeyVault/vaults@2023-07-01' = {
   name: keyVaultName
@@ -39,5 +40,5 @@ resource mysqlPasswordSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
 
 output keyVaultId string = kv.id
 output keyVaultName string = kv.name
-output mysqlUserSecretUri string = mysqlUserSecret.properties.secretUri
-output mysqlPasswordSecretUri string = mysqlPasswordSecret.properties.secretUri
+output mysqlUserSecretUri string = mysqlUserSecret.properties.value
+output mysqlPasswordSecretUri string = mysqlPasswordSecret.properties.value
