@@ -4,7 +4,7 @@ targetScope = 'subscription'
 param mysqlAdminPassword string
 param mysqlAdminUser string 
 param location string = 'eastus'
-param resourceGroupName string = 'rg-openemr-dev-${location}'
+param resourceGroupName string
 param acaEnvironmentName string = 'cae-openemr-dev-${location}' 
 param containerAppName string = 'ca-openemr-dev-${location}'
 param acrName string = 'acr-openemr-dev-${location}'
