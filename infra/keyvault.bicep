@@ -1,8 +1,8 @@
 param location string
 param keyVaultName string
-param mysqlAdminUser string
 @secure()
 param mysqlAdminPassword string
+param mysqlAdminUser string 
 
 resource kv 'Microsoft.KeyVault/vaults@2023-07-01' = {
   name: keyVaultName
