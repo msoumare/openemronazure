@@ -15,11 +15,7 @@ param userAssignedIdentityId string
 resource acaEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
   name: acaEnvironmentName
   location: location
-  properties: {
-    appLogsConfiguration: {
-      destination: 'log-analytics'
-    }
-  }
+  properties: {}
 }
 
 // ACA Environment Storage (Azure File share)
