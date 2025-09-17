@@ -20,6 +20,7 @@ on:
 
 env:
   AZURE_LOCATION: eastus  
+  MYSQL_ADMIN: mysql-openemr-admin-user
 
 jobs:
   deploy:
@@ -34,11 +35,21 @@ jobs:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}     
+
+    - name: Generate MySQL Admin Password
+      id: pwgen
+      run: |
+          # Generate a strong 32-char random password
+          MYSQL_PASSWORD=$(openssl rand -base64 32 | tr -d '=+/')
+          echo "mysql_password=$MYSQL_PASSWORD" >> $GITHUB_OUTPUT        
   
 
     - name: Deploy Bicep Infrastructure
       run: |
         az deployment sub create \
         --location $AZURE_LOCATION \
-        --template-file infra/main.bicep 
+        --template-file infra/main.bicep \
+        --parameters resourceGroupName=$AZURE_RESOURCE_GROUP \
+                        mysqlAdminUser=$MYSQL_ADMIN \
+                        mysqlAdminPassword=${{ steps.pwgen.outputs.mysql_password }}        
 

@@ -2,7 +2,7 @@ targetScope = 'subscription'
 
 @secure()
 param mysqlAdminPassword string
-param mysqlAdminUser string
+param mysqlAdminUser string 
 param location string = 'eastus'
 param resourceGroupName string = 'rg-openemr-dev-${location}'
 param acaEnvironmentName string = 'cae-openemr-dev-${location}' 
