@@ -35,7 +35,7 @@ module keyvault './keyvault.bicep' = {
 
 // Deploy ACR
 module acr './acr.bicep' = {
-  name: 'acr-deploy'
+  // name: 'acr-deploy'
   scope: rg
   params: {
     location: location
@@ -48,7 +48,7 @@ module mysql './mysql.bicep' = {
   name: 'mysql-deploy'
   scope: rg
   params: {
-    location: 'location'
+    location: location
     mySqlName: mySqlName
     mysqlUser: keyvault.outputs.mysqlUserSecretUri        // ✅ use secret reference
     mysqlPassword: keyvault.outputs.mysqlPasswordSecretUri
