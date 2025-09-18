@@ -8,15 +8,15 @@ param containerAppName string
 @description('Resource ID of the User Assigned Managed Identity to attach to ACA')
 param userAssignedIdentityId string
 
-// OpenEMR required configuration (mirrors local docker-compose expectations)
-@description('FQDN of the Azure MySQL Flexible Server (e.g. myserver.mysql.database.azure.com)')
-param mysqlHost string
-@description('OpenEMR application (admin) username to bootstrap login - match local compose OE_USER')
-param oeUser string = 'admin'
-@description('OpenEMR application (admin) password to bootstrap login - match local compose OE_PASS (override in production)')
-param oePass string = 'pass'
-@description('Timezone for the container (PHP + OS). Example: UTC or America/New_York')
-param timezone string = 'UTC'
+// OpenEMR configuration now sourced from Key Vault secrets instead of plain parameters
+@description('Key Vault secret URI containing the MySQL Flexible Server host name (e.g. myserver.mysql.database.azure.com)')
+param mysqlHostSecretUri string
+@description('Key Vault secret URI containing the OpenEMR application admin username (OE_USER)')
+param oeUserSecretUri string
+@description('Key Vault secret URI containing the OpenEMR application admin password (OE_PASS)')
+param oePassSecretUri string
+@description('Key Vault secret URI containing the timezone string (e.g. UTC or America/New_York)')
+param timezoneSecretUri string
 
 
 // ACA Environment
@@ -62,6 +62,27 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
           keyVaultUrl: mysqlPasswordSecretUri
           identity: userAssignedIdentityId
         }
+        // Additional OpenEMR configuration sourced from Key Vault
+        {
+          name: 'mysql-host'
+          keyVaultUrl: mysqlHostSecretUri
+          identity: userAssignedIdentityId
+        }
+        {
+          name: 'oe-user'
+          keyVaultUrl: oeUserSecretUri
+          identity: userAssignedIdentityId
+        }
+        {
+          name: 'oe-pass'
+          keyVaultUrl: oePassSecretUri
+          identity: userAssignedIdentityId
+        }
+        {
+          name: 'timezone'
+          keyVaultUrl: timezoneSecretUri
+          identity: userAssignedIdentityId
+        }
       ]
     }
     template: {
@@ -90,7 +111,7 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
             // OpenEMR expected env vars (align with local docker-compose.yml)
             {
               name: 'MYSQL_HOST'
-              value: mysqlHost
+              secretRef: 'mysql-host'
             }
             // OpenEMR image expects MYSQL_ROOT_PASS even when using a flexible server admin user; reuse admin password
             {
@@ -108,15 +129,15 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
             }
             {
               name: 'OE_USER'
-              value: oeUser
+              value: 'admin'
             }
             {
               name: 'OE_PASS'
-              value: oePass
+              value: 'pass'
             }
             {
               name: 'TZ'
-              value: timezone
+              secretRef: 'timezone'
             }
           ]
           // No volume mounts (ephemeral storage). If persistence is needed later, reintroduce Azure File or Blob storage.
