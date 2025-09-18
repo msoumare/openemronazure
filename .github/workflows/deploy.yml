@@ -76,6 +76,7 @@ jobs:
 
       - name: Build & Push OpenEMR to ACR
         run: |
+            cd openemr
             az acr build \
             --registry ${{ env.ACR_NAME }}  \
             --image ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} \
