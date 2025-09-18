@@ -9,14 +9,14 @@ param containerAppName string
 param userAssignedIdentityId string
 
 // OpenEMR configuration now sourced from Key Vault secrets instead of plain parameters
-@description('Key Vault secret URI containing the MySQL Flexible Server host name (e.g. myserver.mysql.database.azure.com)')
-param mysqlHostSecretUri string
-@description('Key Vault secret URI containing the OpenEMR application admin username (OE_USER)')
-param oeUserSecretUri string
+@description('Plain MySQL Flexible Server host name (e.g. myserver.mysql.database.azure.com)')
+param mysqlHost string
+@description('Plain OpenEMR application admin username (OE_USER)')
+param oeUser string = 'admin'
 @description('Key Vault secret URI containing the OpenEMR application admin password (OE_PASS)')
 param oePassSecretUri string
-@description('Key Vault secret URI containing the timezone string (e.g. UTC or America/New_York)')
-param timezoneSecretUri string
+@description('Plain timezone value (e.g. UTC or America/New_York)')
+param timezone string = 'UTC'
 
 
 // ACA Environment
@@ -63,26 +63,14 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
           identity: userAssignedIdentityId
         }
         // Additional OpenEMR configuration sourced from Key Vault
-        {
-          name: 'mysql-host'
-          keyVaultUrl: mysqlHostSecretUri
-          identity: userAssignedIdentityId
-        }
-        {
-          name: 'oe-user'
-          keyVaultUrl: oeUserSecretUri
-          identity: userAssignedIdentityId
-        }
+        // mysql-host no longer stored as secret
+        // oe-user no longer stored as a secret
         {
           name: 'oe-pass'
           keyVaultUrl: oePassSecretUri
           identity: userAssignedIdentityId
         }
-        {
-          name: 'timezone'
-          keyVaultUrl: timezoneSecretUri
-          identity: userAssignedIdentityId
-        }
+        // timezone no longer stored as a secret; using direct env value
       ]
     }
     template: {
@@ -111,7 +99,7 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
             // OpenEMR expected env vars (align with local docker-compose.yml)
             {
               name: 'MYSQL_HOST'
-              secretRef: 'mysql-host'
+              value: mysqlHost
             }
             // OpenEMR image expects MYSQL_ROOT_PASS even when using a flexible server admin user; reuse admin password
             {
@@ -129,7 +117,7 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
             }
             {
               name: 'OE_USER'
-              secretRef: 'oe-user'
+              value: oeUser
             }
             {
               name: 'OE_PASS'
@@ -137,7 +125,7 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
             }
             {
               name: 'TZ'
-              secretRef: 'timezone'
+              value: timezone
             }
           ]
           // No volume mounts (ephemeral storage). If persistence is needed later, reintroduce Azure File or Blob storage.

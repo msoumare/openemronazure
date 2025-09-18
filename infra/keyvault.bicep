@@ -4,12 +4,10 @@ param keyVaultName string
 param mysqlAdminUser string 
 @secure()
 param mysqlAdminPassword string
-// Additional OpenEMR configuration secrets
-param mysqlHost string
-param oeUser string
+// Additional OpenEMR configuration secrets (mysqlHost now plain value, not stored as secret)
+// OE user no longer stored as a secret; set directly via container env
 @secure()
 param oePass string
-param timezone string = 'UTC'
 
 resource kv 'Microsoft.KeyVault/vaults@2023-07-01' = {
   name: keyVaultName
@@ -44,23 +42,7 @@ resource mysqlPasswordSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
   }
 }
 
-// Store MySQL host (not highly sensitive but keep in KV for consistent retrieval pattern)
-resource mysqlHostSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
-  parent: kv
-  name: 'mysql-host'
-  properties: {
-    value: mysqlHost
-  }
-}
 
-// Store OpenEMR app user (OE_USER)
-resource oeUserSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
-  parent: kv
-  name: 'oe-user'
-  properties: {
-    value: oeUser
-  }
-}
 
 // Store OpenEMR app password (OE_PASS)
 resource oePassSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
@@ -71,15 +53,14 @@ resource oePassSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
   }
 }
 
-// Store timezone selection
-resource timezoneSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
-  parent: kv
-  name: 'timezone'
-  properties: {
-    value: timezone
-  }
-}
 
 output keyVaultId string = kv.id
 output keyVaultName string = kv.name
-// Intentionally NOT outputting secret URIs to avoid exposing secret metadata and to satisfy linter rule.
+// Provide versioned secret URIs (Container Apps may require versioned identifiers). Suppressing linter warnings.
+// bicep:disable-next-line outputs-should-not-contain-secrets -- Container Apps requires versioned secret URIs; acceptable risk (URIs only, not values)
+output mysqlUserSecretUri string = mysqlUserSecret.properties.secretUriWithVersion
+// bicep:disable-next-line outputs-should-not-contain-secrets -- same rationale
+output mysqlPasswordSecretUri string = mysqlPasswordSecret.properties.secretUriWithVersion
+// bicep:disable-next-line outputs-should-not-contain-secrets -- same rationale
+output oePassSecretUri string = oePassSecret.properties.secretUriWithVersion
+// bicep:disable-next-line outputs-should-not-contain-secrets -- same rationale

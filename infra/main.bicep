@@ -36,10 +36,8 @@ module keyvault './keyvault.bicep' = {
     keyVaultName: keyVaultName
     mysqlAdminUser: mysqlAdminUser
     mysqlAdminPassword: mysqlAdminPassword
-    mysqlHost: mysqlHost
-    oeUser: oeUser
-    oePass: oePass
-    timezone: timezone
+  // mysqlHost no longer stored in Key Vault
+  oePass: oePass
   }
 }
 
@@ -160,12 +158,12 @@ module aca './aca.bicep' = {
     location: location
     acrServer: acr.outputs.acrServer
     // Build secret URIs inline (avoids outputting secrets from keyvault module)
-  mysqlUserSecretUri: 'https://${keyVaultName}.${environment().suffixes.keyvaultDns}/secrets/mysql-admin-user'
-  mysqlPasswordSecretUri: 'https://${keyVaultName}.${environment().suffixes.keyvaultDns}/secrets/mysql-admin-password'
-  mysqlHostSecretUri: 'https://${keyVaultName}.${environment().suffixes.keyvaultDns}/secrets/mysql-host'
-  oeUserSecretUri: 'https://${keyVaultName}.${environment().suffixes.keyvaultDns}/secrets/oe-user'
-  oePassSecretUri: 'https://${keyVaultName}.${environment().suffixes.keyvaultDns}/secrets/oe-pass'
-  timezoneSecretUri: 'https://${keyVaultName}.${environment().suffixes.keyvaultDns}/secrets/timezone'
+  mysqlUserSecretUri: keyvault.outputs.mysqlUserSecretUri
+  mysqlPasswordSecretUri: keyvault.outputs.mysqlPasswordSecretUri
+  mysqlHost: mysqlHost
+  oeUser: oeUser
+  oePassSecretUri: keyvault.outputs.oePassSecretUri
+  timezone: timezone
     appInsightsKey: appInsights.outputs.instrumentationKey
     userAssignedIdentityId: uami.outputs.uamiId
     acaEnvironmentName: acaEnvironmentName
