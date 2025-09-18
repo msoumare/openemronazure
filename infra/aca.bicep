@@ -61,8 +61,8 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
           image: 'openemr/openemr:7.0.2'
           resources: {
             // Bicep type currently expects int; use 1 vCPU (adjust if fractional becomes supported in your API version)
-            cpu: 1
-            memory: '1Gi'
+            cpu: '0.5'
+            memory: '2Gi'
           }
           env: [
             {
