@@ -73,12 +73,11 @@ jobs:
 
       - name: Clone OpenEMR Repo
         run: |
-            git clone https://github.com/openemr/openemr.git        
-            cd openemr 
+            git clone https://github.com/openemr/openemr.git
             az acr build \
-            --registry ${{ env.ACR_NAME }}  \
+            --registry ${{ env.ACR_NAME }} \
             --image ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} \
-            ./${{ env.IMAGE_NAME }}         
+            ./openemr     
   
 
 
