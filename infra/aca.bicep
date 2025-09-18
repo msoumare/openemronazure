@@ -129,11 +129,11 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
             }
             {
               name: 'OE_USER'
-              value: 'admin'
+              secretRef: 'oe-user'
             }
             {
               name: 'OE_PASS'
-              value: 'pass'
+              secretRef: 'oe-pass'
             }
             {
               name: 'TZ'
