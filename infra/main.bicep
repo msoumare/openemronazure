@@ -153,9 +153,6 @@ module aca './aca.bicep' = {
     acrServer: acr.outputs.acrServer
     mysqlUserSecretUri: keyvault.outputs.mysqlUserSecretUri
     mysqlPasswordSecretUri: keyvault.outputs.mysqlPasswordSecretUri
-    storageShareName: storage.outputs.fileShareName
-    storageAccountId: storage.outputs.storageAccountId 
-    storageAccountName: storage.outputs.storageAccountName  
     appInsightsKey: appInsights.outputs.instrumentationKey
     userAssignedIdentityId: uami.outputs.uamiId
     acaEnvironmentName: acaEnvironmentName

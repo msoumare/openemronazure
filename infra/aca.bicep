@@ -2,20 +2,12 @@ param location string
 param acrServer string
 param mysqlUserSecretUri string
 param mysqlPasswordSecretUri string
-param storageAccountId string
-param storageAccountName string
-param storageShareName string
 param appInsightsKey string
 param acaEnvironmentName string
 param containerAppName string
 @description('Resource ID of the User Assigned Managed Identity to attach to ACA')
 param userAssignedIdentityId string
 
-@description('Name of the managed environment storage (used in volume mounts). Change only if you need a new storage binding.')
-param acaStorageName string = 'mystorage'
-
-@description('Set to true only on the first deployment that should create the managed environment storage. After it exists, set to false to avoid update limitation (only accountKey can be updated).')
-param createAcaStorage bool = true
 
 // ACA Environment
 resource acaEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
@@ -24,20 +16,6 @@ resource acaEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
   properties: {}
 }
 
-// ACA Environment Storage (Azure File share)
-// Managed Environment Storage (can only be created once; subsequent deployments must not attempt to modify except accountKey)
-resource acaStorage 'Microsoft.App/managedEnvironments/storages@2023-05-01' = if (createAcaStorage) {
-  name: acaStorageName
-  parent: acaEnv
-  properties: {
-    azureFile: {
-      accountName: storageAccountName
-      shareName: storageShareName
-      accessMode: 'ReadWrite'
-      accountKey: listKeys(storageAccountId, '2022-09-01').keys[0].value
-    }
-  }
-}
 
 // Container App
 resource aca 'Microsoft.App/containerApps@2023-05-01' = {
@@ -49,10 +27,7 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
       '${userAssignedIdentityId}': {}
     }
   }
-  // Ensure storage (if being created) is deployed before container app. Safe even if conditional resource not deployed.
-  dependsOn: [
-    acaStorage
-  ]
+  // No external storage; using ephemeral container filesystem only.
   properties: {
     managedEnvironmentId: acaEnv.id
     configuration: {
@@ -103,21 +78,10 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
               value: appInsightsKey
             }
           ]
-          volumeMounts: [
-            {
-              volumeName: 'sites-volume'
-              mountPath: '/var/www/openemr/sites'
-            }
-          ]
+          // No volume mounts (ephemeral storage). If persistence is needed later, reintroduce Azure File or Blob storage.
         }
       ]
-      volumes: [
-        {
-          name: 'sites-volume'
-          storageType: 'AzureFile'
-          storageName: acaStorageName // must match the managed environment storage name
-        }
-      ]
+      // No volumes defined.
       scale: {
         minReplicas: 1
         maxReplicas: 3
