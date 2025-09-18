@@ -72,7 +72,7 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
       containers: [
         {
           name: 'openemr'
-          image: '${acrServer}/openemr:latest'
+          image: 'openemr/openemr:7.0.2'
           resources: {
             cpu: '0.5'
             memory: '1Gi'
