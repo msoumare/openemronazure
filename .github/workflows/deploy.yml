@@ -27,6 +27,9 @@ env:
   MYSQL_SERVER_NAME: mysql-openemr-dev-westus2
   # Optional override for timezone passed into template (defaults to UTC if omitted)
   OPENEMR_TIMEZONE: UTC
+  ACR_NAME: acropenemrdevwestus2
+  IMAGE_NAME: openemr
+  IMAGE_TAG: latest  
 
 jobs:
   deploy:
@@ -68,11 +71,16 @@ jobs:
       - name: Deploy Bicep Infrastructure
         run: |
 
-          az role assignment create \
-            --assignee 91be503e-391b-4417-8e77-3bbf5d20a9c0 \
-            --role AcrPush \
-            --scope /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ env.AZURE_RESOURCE_GROUP }}/providers/Microsoft.ContainerRegistry/registries/acropenemrdevwestus2
+      - name: Clone OpenEMR Repo
+        run: git clone https://github.com/openemr/openemr.git        
 
+      - name: Build & Push OpenEMR to ACR
+        run: |
+            az acr build \
+            --registry ${{ env.ACR_NAME }}  \
+            --image ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} \
+            ./${{ env.IMAGE_NAME }}         
+  
         #   az deployment sub create \
         #     --name main-westus2 \
         #     --location $AZURE_LOCATION \
