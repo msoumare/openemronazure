@@ -11,6 +11,12 @@ param containerAppName string
 @description('Resource ID of the User Assigned Managed Identity to attach to ACA')
 param userAssignedIdentityId string
 
+@description('Name of the managed environment storage (used in volume mounts). Change only if you need a new storage binding.')
+param acaStorageName string = 'mystorage'
+
+@description('Set to true only on the first deployment that should create the managed environment storage. After it exists, set to false to avoid update limitation (only accountKey can be updated).')
+param createAcaStorage bool = true
+
 // ACA Environment
 resource acaEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
   name: acaEnvironmentName
@@ -19,8 +25,9 @@ resource acaEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
 }
 
 // ACA Environment Storage (Azure File share)
-resource acaStorage 'Microsoft.App/managedEnvironments/storages@2023-05-01' = {
-  name: 'mystorage' // name used in volumes below
+// Managed Environment Storage (can only be created once; subsequent deployments must not attempt to modify except accountKey)
+resource acaStorage 'Microsoft.App/managedEnvironments/storages@2023-05-01' = if (createAcaStorage) {
+  name: acaStorageName
   parent: acaEnv
   properties: {
     azureFile: {
@@ -42,6 +49,10 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
       '${userAssignedIdentityId}': {}
     }
   }
+  // Ensure storage (if being created) is deployed before container app. Safe even if conditional resource not deployed.
+  dependsOn: [
+    acaStorage
+  ]
   properties: {
     managedEnvironmentId: acaEnv.id
     configuration: {
@@ -74,7 +85,8 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
           name: 'openemr'
           image: '${acrServer}/openemr:latest'
           resources: {
-            cpu: '0.5'
+            // Bicep type currently expects int; use 1 vCPU (adjust if fractional becomes supported in your API version)
+            cpu: 1
             memory: '1Gi'
           }
           env: [
@@ -103,7 +115,7 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
         {
           name: 'sites-volume'
           storageType: 'AzureFile'
-          storageName: 'mystorage' // must match acaStorage resource
+          storageName: acaStorageName // must match the managed environment storage name
         }
       ]
       scale: {
