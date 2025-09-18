@@ -8,6 +8,16 @@ param containerAppName string
 @description('Resource ID of the User Assigned Managed Identity to attach to ACA')
 param userAssignedIdentityId string
 
+// OpenEMR required configuration (mirrors local docker-compose expectations)
+@description('FQDN of the Azure MySQL Flexible Server (e.g. myserver.mysql.database.azure.com)')
+param mysqlHost string
+@description('OpenEMR application (admin) username to bootstrap login - match local compose OE_USER')
+param oeUser string = 'admin'
+@description('OpenEMR application (admin) password to bootstrap login - match local compose OE_PASS (override in production)')
+param oePass string = 'pass'
+@description('Timezone for the container (PHP + OS). Example: UTC or America/New_York')
+param timezone string = 'UTC'
+
 
 // ACA Environment
 resource acaEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
@@ -61,8 +71,8 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
           image: 'openemr/openemr:7.0.2'
           resources: {
             // Bicep type currently expects int; use 1 vCPU (adjust if fractional becomes supported in your API version)
-            cpu: '0.5'
-            memory: '1Gi'
+            cpu: 1
+            memory: '2Gi'
           }
           env: [
             {
@@ -76,6 +86,37 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
             {
               name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
               value: appInsightsKey
+            }
+            // OpenEMR expected env vars (align with local docker-compose.yml)
+            {
+              name: 'MYSQL_HOST'
+              value: mysqlHost
+            }
+            // OpenEMR image expects MYSQL_ROOT_PASS even when using a flexible server admin user; reuse admin password
+            {
+              name: 'MYSQL_ROOT_PASS'
+              secretRef: 'mysql-admin-password'
+            }
+            // Map MYSQL_USER / MYSQL_PASS to the same admin credentials (or provide separate app user secrets later)
+            {
+              name: 'MYSQL_USER'
+              secretRef: 'mysql-admin-user'
+            }
+            {
+              name: 'MYSQL_PASS'
+              secretRef: 'mysql-admin-password'
+            }
+            {
+              name: 'OE_USER'
+              value: oeUser
+            }
+            {
+              name: 'OE_PASS'
+              value: oePass
+            }
+            {
+              name: 'TZ'
+              value: timezone
             }
           ]
           // No volume mounts (ephemeral storage). If persistence is needed later, reintroduce Azure File or Blob storage.
