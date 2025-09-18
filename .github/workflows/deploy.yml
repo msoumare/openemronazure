@@ -22,6 +22,10 @@ env:
   AZURE_LOCATION: westus2
   AZURE_RESOURCE_GROUP: 'rg-openemr-dev-westus2'  
   MYSQL_ADMIN: openemrlogin
+  # Match main.bicep default mySqlName (ensure kept in sync). Used to derive mysqlHost FQDN.
+  MYSQL_SERVER_NAME: mysql-openemr-dev-westus2
+  # Optional override for timezone passed into template (defaults to UTC if omitted)
+  OPENEMR_TIMEZONE: UTC
 
 jobs:
   deploy:
@@ -35,17 +39,34 @@ jobs:
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}      
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}   
 
       - name: Generate MySQL Admin Password
         id: pwgen
         run: |
           # Generate a strong 32-char random password
           MYSQL_PASSWORD=$(openssl rand -base64 32 | tr -d '=+/')
+          echo "::add-mask::$MYSQL_PASSWORD"
           echo "mysql_password=$MYSQL_PASSWORD" >> $GITHUB_OUTPUT
+
+      - name: Generate OpenEMR Admin Password (OE_PASS)
+        id: oepwgen
+        run: |
+          # Separate strong password for OpenEMR web admin (distinct from DB password)
+          OE_PASS=$(openssl rand -base64 24 | tr -d '=+/')
+          echo "::add-mask::$OE_PASS"
+          echo "oe_pass=$OE_PASS" >> $GITHUB_OUTPUT
+
+      - name: Derive MySQL Host FQDN
+        id: derive
+        run: |
+          MYSQL_HOST_FQDN="${MYSQL_SERVER_NAME}.mysql.database.azure.com"
+          echo "mysql_host=$MYSQL_HOST_FQDN" >> $GITHUB_OUTPUT
+          echo "Derived MySQL host: $MYSQL_HOST_FQDN"
 
       - name: Deploy Bicep Infrastructure
         run: |
+
           az role assignment create \
             --assignee 91be503e-391b-4417-8e77-3bbf5d20a9c0 \
             --role AcrPush \
@@ -60,3 +81,17 @@ jobs:
         #                  mysqlAdminPassword=${{ steps.pwgen.outputs.mysql_password }} \
         #     --debug \
         #     --verbose
+
+        #   az deployment sub create \
+        #    --name main-westus2 \
+        #    --location $AZURE_LOCATION \
+        #    --template-file infra/main.bicep \
+        #    --parameters resourceGroupName=${{ env.AZURE_RESOURCE_GROUP }} \
+        #                 mysqlAdminUser=${{ env.MYSQL_ADMIN }} \
+        #                 mysqlAdminPassword=${{ steps.pwgen.outputs.mysql_password }} \
+        #                 mysqlHost=${{ steps.derive.outputs.mysql_host }} \
+        #                 oePass=${{ steps.oepwgen.outputs.oe_pass }} \
+        #                 oeUser=admin \
+        #                 timezone=${{ env.OPENEMR_TIMEZONE }} \
+        #    --verbose
+

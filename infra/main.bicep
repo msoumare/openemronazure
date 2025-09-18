@@ -4,6 +4,12 @@ targetScope = 'subscription'
 param mysqlAdminUser string 
 @secure()
 param mysqlAdminPassword string
+// Additional OpenEMR config (will be stored as Key Vault secrets)
+param mysqlHost string
+param oeUser string = 'admin'
+@secure()
+param oePass string
+param timezone string = 'UTC'
 param location string = 'westus2'
 param resourceGroupName string
 param acaEnvironmentName string = 'cae-openemr-dev-westus2' 
@@ -29,7 +35,9 @@ module keyvault './keyvault.bicep' = {
     location: location
     keyVaultName: keyVaultName
     mysqlAdminUser: mysqlAdminUser
-    mysqlAdminPassword: mysqlAdminPassword    
+    mysqlAdminPassword: mysqlAdminPassword
+  // mysqlHost no longer stored in Key Vault
+  oePass: oePass
   }
 }
 
@@ -124,9 +132,7 @@ module rbacStorage './rbac-storage.bicep' = {
       '0c867c2a-1d8c-454a-a3db-ab2ea1bdc8bb' // Storage File Data SMB Share Contributor
     )    
   }
-  dependsOn: [
-    storage
-  ]  
+  // dependsOn storage not required; module already references outputs creating implicit dependency
 }
 
 module rbacAcr './rbac-acr.bicep' = {
@@ -151,11 +157,13 @@ module aca './aca.bicep' = {
   params: {
     location: location
     acrServer: acr.outputs.acrServer
-    mysqlUserSecretUri: keyvault.outputs.mysqlUserSecretUri
-    mysqlPasswordSecretUri: keyvault.outputs.mysqlPasswordSecretUri
-    storageShareName: storage.outputs.fileShareName
-    storageAccountId: storage.outputs.storageAccountId 
-    storageAccountName: storage.outputs.storageAccountName  
+    // Build secret URIs inline (avoids outputting secrets from keyvault module)
+  mysqlUserSecretUri: keyvault.outputs.mysqlUserSecretUri
+  mysqlPasswordSecretUri: keyvault.outputs.mysqlPasswordSecretUri
+  mysqlHost: mysqlHost
+  oeUser: oeUser
+  oePassSecretUri: keyvault.outputs.oePassSecretUri
+  timezone: timezone
     appInsightsKey: appInsights.outputs.instrumentationKey
     userAssignedIdentityId: uami.outputs.uamiId
     acaEnvironmentName: acaEnvironmentName
