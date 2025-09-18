@@ -74,8 +74,6 @@ jobs:
       - name: Clone OpenEMR Repo
         run: git clone https://github.com/openemr/openemr.git        
 
-      - name: Build & Push OpenEMR to ACR
-        run: |
             cd openemr
             az acr build \
             --registry ${{ env.ACR_NAME }}  \
