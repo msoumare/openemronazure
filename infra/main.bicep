@@ -10,17 +10,17 @@ param oeUser string = 'admin'
 @secure()
 param oePass string
 param timezone string = 'UTC'
-param location string = 'westus2'
+param location string = 'northeurope'
 param resourceGroupName string
-param acaEnvironmentName string = 'cae-openemr-dev-westus2' 
-param containerAppName string = 'ca-openemr-dev-westus2'
-param acrName string = 'acropenemrdevwestus2'
-param appInsightsName string = 'appi-openemr-dev-westus2'
-param keyVaultName string = 'kv-openemr-dev-westus2'
-param logAnalyticsName string = 'log-openemr-dev-westus2'
-param mySqlName string = 'mysql-openemr-dev-westus2'
-param storageAccountName string = 'saopenemrdevwestus2'
-param userAssignedIdentityName string = 'uai-openemr-dev-westus2'
+param acaEnvironmentName string = 'cae-openemr-dev-northeurope' 
+param containerAppName string = 'ca-openemr-dev-northeurope'
+param acrName string = 'acropenemrdevnortheurope'
+param appInsightsName string = 'appi-openemr-dev-northeurope'
+param keyVaultName string = 'kv-openemr-dev-northeurope'
+param logAnalyticsName string = 'log-openemr-dev-northeurope'
+param mySqlName string = 'mysql-openemr-dev-northeurope'
+param storageAccountName string = 'saopenemrdevnortheurope'
+param userAssignedIdentityName string = 'uai-openemr-dev-northeurope'
 
 resource rg 'Microsoft.Resources/resourceGroups@2022-09-01' = {
   name: resourceGroupName

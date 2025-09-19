@@ -20,11 +20,11 @@ on:
         default: "dev"
 
 env:
-  AZURE_LOCATION: westus2
-  AZURE_RESOURCE_GROUP: 'rg-openemr-dev-westus2'  
+  AZURE_LOCATION: northeurope
+  AZURE_RESOURCE_GROUP: 'rg-openemr-dev-northeurope'  
   MYSQL_ADMIN: openemrlogin
   # Match main.bicep default mySqlName (ensure kept in sync). Used to derive mysqlHost FQDN.
-  MYSQL_SERVER_NAME: mysql-openemr-dev-westus2
+  MYSQL_SERVER_NAME: mysql-openemr-dev-northeurope
   # Optional override for timezone passed into template (defaults to UTC if omitted)
   OPENEMR_TIMEZONE: UTC
 
@@ -68,7 +68,7 @@ jobs:
       - name: Deploy Bicep Infrastructure
         run: |
           az deployment sub create \
-           --name main-westus2 \
+           --name main-northeurope \
            --location $AZURE_LOCATION \
            --template-file infra/main.bicep \
            --parameters resourceGroupName=${{ env.AZURE_RESOURCE_GROUP }} \
