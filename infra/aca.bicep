@@ -2,7 +2,7 @@ param location string
 param acrServer string
 param mysqlUserSecretUri string
 param mysqlPasswordSecretUri string
-param appInsightsKey string
+param appInsightsConnectionString string
 param acaEnvironmentName string
 param containerAppName string
 @description('Resource ID of the User Assigned Managed Identity to attach to ACA')
@@ -93,8 +93,8 @@ resource aca 'Microsoft.App/containerApps@2023-05-01' = {
               secretRef: 'mysql-admin-password'
             }
             {
-              name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-              value: appInsightsKey
+              name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+              value: appInsightsConnectionString
             }
             // OpenEMR expected env vars (align with local docker-compose.yml)
             {
