@@ -22,7 +22,7 @@ on:
 env:
   AZURE_LOCATION: northeurope
   AZURE_RESOURCE_GROUP: 'rg-openemr-dev-northeurope'  
-  MYSQL_ADMIN: openemrlogin
+  MYSQL_ADMIN: openemradmin
   # Match main.bicep default mySqlName (ensure kept in sync). Used to derive mysqlHost FQDN.
   MYSQL_SERVER_NAME: mysql-openemr-dev-northeurope
   # Optional override for timezone passed into template (defaults to UTC if omitted)
