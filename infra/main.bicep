@@ -18,7 +18,7 @@ param acrName string = 'acropenemrdevwesteurope'
 param appInsightsName string = 'appi-openemr-dev-westeurope'
 param keyVaultName string = 'kv-openemr-dev-westeu'
 param logAnalyticsName string = 'log-openemr-dev-westeurope'
-param mySqlName string = 'mysql-openemr-dev-westeurope'
+param mySqlName string = 'mysql-openemr-dev-uksouth'
 param storageAccountName string = 'saopenemrdevwesteurope'
 param userAssignedIdentityName string = 'uai-openemr-dev-westeurope'
 
