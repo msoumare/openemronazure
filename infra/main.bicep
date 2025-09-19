@@ -10,17 +10,17 @@ param oeUser string = 'openemradmin'
 @secure()
 param oePass string
 param timezone string = 'UTC'
-param location string = 'northeurope'
+param location string = 'westeurope'
 param resourceGroupName string
-param acaEnvironmentName string = 'cae-openemr-dev-northeurope' 
-param containerAppName string = 'ca-openemr-dev-northeurope'
-param acrName string = 'acropenemrdevnortheurope'
-param appInsightsName string = 'appi-openemr-dev-northeurope'
-param keyVaultName string = 'kv-openemr-dev-northeu'
-param logAnalyticsName string = 'log-openemr-dev-northeurope'
-param mySqlName string = 'mysql-openemr-dev-northeurope'
-param storageAccountName string = 'saopenemrdevnortheurope'
-param userAssignedIdentityName string = 'uai-openemr-dev-northeurope'
+param acaEnvironmentName string = 'cae-openemr-dev-westeurope' 
+param containerAppName string = 'ca-openemr-dev-westeurope'
+param acrName string = 'acropenemrdevwesteurope'
+param appInsightsName string = 'appi-openemr-dev-westeurope'
+param keyVaultName string = 'kv-openemr-dev-westeu'
+param logAnalyticsName string = 'log-openemr-dev-westeurope'
+param mySqlName string = 'mysql-openemr-dev-westeurope'
+param storageAccountName string = 'saopenemrdevwesteurope'
+param userAssignedIdentityName string = 'uai-openemr-dev-westeurope'
 
 resource rg 'Microsoft.Resources/resourceGroups@2022-09-01' = {
   name: resourceGroupName
@@ -158,16 +158,19 @@ module aca './aca.bicep' = {
     location: location
     acrServer: acr.outputs.acrServer
     // Build secret URIs inline (avoids outputting secrets from keyvault module)
-  mysqlUserSecretUri: keyvault.outputs.mysqlUserSecretUri
-  mysqlPasswordSecretUri: keyvault.outputs.mysqlPasswordSecretUri
-  mysqlHost: mysqlHost
-  oeUser: oeUser
-  oePassSecretUri: keyvault.outputs.oePassSecretUri
-  timezone: timezone
+    mysqlUserSecretUri: keyvault.outputs.mysqlUserSecretUri
+    mysqlPasswordSecretUri: keyvault.outputs.mysqlPasswordSecretUri
+    mysqlHost: mysqlHost
+    oeUser: oeUser
+    oePassSecretUri: keyvault.outputs.oePassSecretUri
+    timezone: timezone
     appInsightsConnectionString: appInsights.outputs.appInsightsConnectionString
     userAssignedIdentityId: uami.outputs.uamiId
     acaEnvironmentName: acaEnvironmentName
     containerAppName: containerAppName
+    storageAccountName: storage.outputs.storageAccountName
+    // Use the output tied to the actual share resource so ACA waits for share creation
+    fileShareName: storage.outputs.fileShareName
   }
 }
 
