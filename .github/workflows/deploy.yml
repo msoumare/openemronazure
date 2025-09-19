@@ -78,5 +78,6 @@ jobs:
                         oePass=${{ steps.oepwgen.outputs.oe_pass }} \
                         oeUser=admin \
                         timezone=${{ env.OPENEMR_TIMEZONE }} \
+           --debug \
            --verbose
 
