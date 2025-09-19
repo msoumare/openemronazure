@@ -20,7 +20,7 @@ var envStorageName = '${storageAccountName}-${fileShareName}'
 @description('Plain MySQL Flexible Server host name (e.g. myserver.mysql.database.azure.com)')
 param mysqlHost string
 @description('Plain OpenEMR application admin username (OE_USER)')
-param oeUser string = 'admin'
+param oeUser string = 'openemradmin'
 @description('Key Vault secret URI containing the OpenEMR application admin password (OE_PASS)')
 param oePassSecretUri string
 @description('Plain timezone value (e.g. UTC or America/New_York)')
