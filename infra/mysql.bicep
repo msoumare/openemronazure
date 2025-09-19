@@ -9,7 +9,7 @@ param mysqlPassword string
 
 resource mysql 'Microsoft.DBforMySQL/flexibleServers@2023-06-01-preview' = {
   name: mySqlName
-  location: location
+  location: 'uksouth'
   sku: {
     name: 'Standard_B1ms'
     tier: 'Burstable'
