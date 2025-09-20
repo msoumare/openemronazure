@@ -225,6 +225,26 @@ resource acaDiag 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
     workspaceId: workspaceId
     logs: [
       {
+        category: 'SystemLogs'
+        enabled: true
+      }
+    ]
+    metrics: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+      }
+    ]
+  }
+}
+
+resource acaEnvDiag 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name: '${acaEnvironmentName}-diag'
+  scope: acaEnv
+  properties: {
+    workspaceId: workspaceId
+    logs: [
+      {
         category: 'AppConsoleLogs'
         enabled: true
       }
