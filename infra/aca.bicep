@@ -155,14 +155,6 @@ resource aca 'Microsoft.App/containerApps@2024-03-01' = {
               value: mysqlHost
             }
             {
-              name: 'MYSQL_ROOT_PASS'
-              secretRef: 'mysql-admin-password'
-            }
-            {
-              name: 'MYSQL_ROOT_USER'
-              secretRef: 'mysql-admin-user'
-            }
-            {
               name: 'MYSQL_USER'
               secretRef: 'mysql-admin-user'
             }
@@ -186,10 +178,10 @@ resource aca 'Microsoft.App/containerApps@2024-03-01' = {
               name: 'TZ'
               value: timezone
             }
-            {
-              name: 'MYSQL_SSL_CA'
-              value: '/var/www/localhost/htdocs/openemr/sites/default/documents/certificates/mysql-ca'
-            }
+            // {
+            //   name: 'MYSQL_SSL_CA'
+            //   value: '/var/www/localhost/htdocs/openemr/sites/default/documents/certificates/mysql-ca'
+            // }
             {
               name: 'MYSQL_SSL_MODE'
               value: 'REQUIRED'
