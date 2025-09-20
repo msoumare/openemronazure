@@ -223,12 +223,6 @@ resource acaDiag 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
   scope: aca
   properties: {
     workspaceId: workspaceId
-    logs: [
-      {
-        category: 'ContainerAppConsoleLogs'
-        enabled: true
-      }
-    ]
     metrics: [
       {
         category: 'AllMetrics'
@@ -243,12 +237,6 @@ resource acaEnvDiag 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' =
   scope: acaEnv
   properties: {
     workspaceId: workspaceId
-    logs: [
-      {
-        category: 'ContainerAppConsoleLogs'
-        enabled: true
-      }
-    ]
     metrics: [
       {
         category: 'AllMetrics'
