@@ -4,6 +4,7 @@ param mysqlUserSecretUri string
 param mysqlPasswordSecretUri string
 @secure()
 param appInsightsConnectionString string
+param workspaceId string
 param acaEnvironmentName string
 param containerAppName string
 
@@ -211,6 +212,31 @@ resource aca 'Microsoft.App/containerApps@2024-03-01' = {
         maxReplicas: 3
       }
     }
+  }
+}
+
+// Diagnostic Settings to pipe ACA logs/metrics to App Insights
+resource acaDiag 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name: '${containerAppName}-diag'
+  scope: aca
+  properties: {
+    workspaceId: workspaceId
+    logs: [
+      {
+        category: 'ContainerAppConsoleLogs'
+        enabled: true
+      }
+      {
+        category: 'SystemLogs'
+        enabled: true
+      }
+    ]
+    metrics: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+      }
+    ]
   }
 }
 

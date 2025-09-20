@@ -76,7 +76,7 @@ jobs:
                         mysqlAdminPassword=${{ steps.pwgen.outputs.mysql_password }} \
                         mysqlHost=${{ steps.derive.outputs.mysql_host }} \
                         oePass=${{ steps.oepwgen.outputs.oe_pass }} \
-                        oeUser=admin \
+                        oeUser=openemradmin \
                         timezone=${{ env.OPENEMR_TIMEZONE }} \
            --debug \
            --verbose

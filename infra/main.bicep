@@ -171,6 +171,7 @@ module aca './aca.bicep' = {
     storageAccountName: storage.outputs.storageAccountName
     // Use the output tied to the actual share resource so ACA waits for share creation
     fileShareName: storage.outputs.fileShareName
+    workspaceId: logs.outputs.workspaceId
   }
 }
 
