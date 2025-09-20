@@ -225,7 +225,7 @@ resource acaDiag 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
     workspaceId: workspaceId
     logs: [
       {
-        category: 'SystemLogs'
+        category: 'ContainerAppConsoleLogs'
         enabled: true
       }
     ]
@@ -245,11 +245,7 @@ resource acaEnvDiag 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' =
     workspaceId: workspaceId
     logs: [
       {
-        category: 'AppConsoleLogs'
-        enabled: true
-      }
-      {
-        category: 'SystemLogs'
+        category: 'ContainerAppConsoleLogs'
         enabled: true
       }
     ]
