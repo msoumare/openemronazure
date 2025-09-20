@@ -22,7 +22,7 @@ on:
 env:
   AZURE_LOCATION: westeurope
   AZURE_RESOURCE_GROUP: 'rg-openemr-dev-westeurope'  
-  MYSQL_ADMIN: openemradmin
+  MYSQL_ADMIN: openemradmin@mysql-openemr-dev-uksouth
   # Match main.bicep default mySqlName (ensure kept in sync). Used to derive mysqlHost FQDN.
   MYSQL_SERVER_NAME: mysql-openemr-dev-uksouth
   # Optional override for timezone passed into template (defaults to UTC if omitted)
@@ -76,7 +76,7 @@ jobs:
                         mysqlAdminPassword=${{ steps.pwgen.outputs.mysql_password }} \
                         mysqlHost=${{ steps.derive.outputs.mysql_host }} \
                         oePass=${{ steps.oepwgen.outputs.oe_pass }} \
-                        oeUser=openemradmin \
+                        oeUser=openemradmin@mysql-openemr-dev-uksouth \
                         timezone=${{ env.OPENEMR_TIMEZONE }} \
            --debug \
            --verbose
