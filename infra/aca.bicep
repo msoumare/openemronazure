@@ -26,7 +26,7 @@ param mysqlHost string
 @description('Plain OpenEMR application admin username (OE_USER)')
 param oeUser string = 'openemradmin'
 
-@description('Key Vault secret URI containing the OpenEMR application admin password (OE_PASS)')
+@description('Key Vault secret URI containing the OpenEMR application admin password (OE_PASS) – must include version')
 param oePassSecretUri string
 
 @description('Timezone for OpenEMR')
@@ -67,6 +67,7 @@ resource aca 'Microsoft.App/containerApps@2024-03-01' = {
   name: containerAppName
   location: location
   dependsOn: [
+    acaEnv
     envStorage
   ]
   identity: {
@@ -84,7 +85,7 @@ resource aca 'Microsoft.App/containerApps@2024-03-01' = {
       }
       registries: [
         {
-          server: acrServer
+          server: acrServer // must be like myacr.azurecr.io
           identity: userAssignedIdentityId
         }
       ]
@@ -116,10 +117,9 @@ resource aca 'Microsoft.App/containerApps@2024-03-01' = {
           args: [
             '-c'
             '''
-            if [ ! -f /mnt/sites/.seeded ]; then
+            if [ ! -f /mnt/sites/default/sqlconf.php ]; then
               echo "Seeding OpenEMR sites directory..."
               cp -r /var/www/localhost/htdocs/openemr/sites/* /mnt/sites/ || true
-              touch /mnt/sites/.seeded
               echo "Sites seeded successfully"
             else
               echo "Sites already initialized, skipping"
@@ -203,8 +203,7 @@ resource aca 'Microsoft.App/containerApps@2024-03-01' = {
       volumes: [
         {
           name: 'sitesdata'
-          storageType: 'AzureFile'
-          storageName: envStorage.name
+          storageName: envStorage.name // no storageType here
         }
       ]
       scale: {
