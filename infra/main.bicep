@@ -6,7 +6,7 @@ param mysqlAdminUser string
 param mysqlAdminPassword string
 // Additional OpenEMR config (will be stored as Key Vault secrets)
 param mysqlHost string
-param oeUser string = 'openemradmin@mysql-openemr-dev-uksouth'
+param oeUser string = 'openemradmin'
 @secure()
 param oePass string
 param timezone string = 'UTC'
