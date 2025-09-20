@@ -118,12 +118,13 @@ resource aca 'Microsoft.App/containerApps@2024-03-01' = {
           args: [
             '-c'
             '''
-            if [ ! -f /mnt/sites/default/sqlconf.php ]; then
-              echo "Seeding OpenEMR sites directory..."
+            if [ ! -f /mnt/sites/.seeded ]; then
+              echo "Seeding OpenEMR sites..."
               cp -r /var/www/localhost/htdocs/openemr/sites/* /mnt/sites/ || true
-              echo "Sites seeded successfully"
+              touch /mnt/sites/.seeded
+              echo "Sites seeded"
             else
-              echo "Sites already initialized, skipping"
+              echo "Sites already seeded, skipping"
             fi
             '''
           ]
@@ -135,6 +136,7 @@ resource aca 'Microsoft.App/containerApps@2024-03-01' = {
           ]
         }
       ]
+
       containers: [
         {
           name: 'openemr'
